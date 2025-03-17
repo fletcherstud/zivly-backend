@@ -1,0 +1,47 @@
+<configuration>
+    <springProfile name="test | docker | it">
+        <!-- Default logging configuration -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+    <springProfile name="prod | qa">
+        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <!-- Include key log details -->
+                    <timestamp>
+                        <fieldName>timestamp</fieldName>
+                    </timestamp>
+                    <logLevel>
+                        <fieldName>level</fieldName>
+                    </logLevel>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <message>
+                        <fieldName>message</fieldName>
+                    </message>
+                    <arguments/>
+                    <stackTrace>
+                        <fieldName>stack_trace</fieldName>
+                    </stackTrace>
+                    <mdc/>
+                </providers>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="JSON_CONSOLE" />
+        </root>
+    </springProfile>
+
+</configuration>

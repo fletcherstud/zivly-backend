@@ -1,0 +1,67 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-exception: false
+  tomcat:
+    relaxed-query-chars: '|,{,},[,]'
+
+spring:
+  profiles:
+    active: test
+  mvc:
+    log-request-details: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  flyway:
+    defaultSchema: edge
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,email,profile
+            redirect-uri: "{baseUrl}/auth/oauth2/code/google"
+            authorization-grant-type: authorization_code
+            provider: google # Links to provider.google
+            client-name: Google
+          apple:
+            client-id: com.jonathanfletcher.zivly
+            team-id: 569RYWV297
+            key-id: 9L2623P6VA
+            scope: name,email
+            redirect-uri: "{baseUrl}/auth/oauth2/code/apple"
+            authorization-grant-type: authorization_code
+            provider: apple
+            client-name: Apple
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/authorize
+            token-uri: https://appleid.apple.com/auth/token
+            jwk-set-uri: https://appleid.apple.com/auth/keys
+            issuer-uri: https://appleid.apple.com
+jwt:
+  access-secret: THISISASECRETKEYTHATNEEDSTOBECHANGEDTHISISASECRETKEYTHATNEEDSTOBECHANGEDTHISISASECRETKEYTHATNEEDSTOBECHANGED
+  refresh-secret: THISISASECRETKEYTHATNEEDSTOBECHANGEDTHISISASECRETKEYTHATNEEDSTOBECHANGEDTHISISASECRETKEYTHATNEEDSTOBECHANGED
+  access-expiration: 3600
+  refresh-expiration: 604800
+
+logging:
+  level:
+    com.zivly.edge: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: DEBUG
+cors:
+  allowed-origins:
+    - "*" # Default for test; override in prod

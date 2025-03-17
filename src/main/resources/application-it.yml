@@ -1,0 +1,13 @@
+reflectoring:
+  trace: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mydb
+    driverClassName: org.postgresql.Driver
+    username: username
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: false # flyway migrations will be run in the 'docker' profile container

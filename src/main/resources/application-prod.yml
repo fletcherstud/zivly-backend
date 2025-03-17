@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url:
+    driverClassName: org.postgresql.Driver
+    username:
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+  profiles: prod
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+          apple:
+            client-id: com.zivly.signin
+apple:
+  aws-secret-id: zivly-apple-secret
+
+aws:
+  region: us-east-1  # Update to your AWS region
+
+server:
+  port: 8080
+
+jwt:
+  access-secret: your-very-secure-access-secret-key # Should be long and random
+  refresh-secret: your-very-secure-refresh-secret-key # Different from access secret
+  access-expiration: 3600  # 1 hour in seconds
+  refresh-expiration: 604800  # 7 days in seconds
+
+cors:
+  allowed-headers:
+    - Origin
+    - Content-Type
+    - Accept
+    - Authorization
+    - Accept-Language
+    - Accept-Encoding
+    - Client-Id
+    - Platform
+    - Access-Control-Allow-Headers
+    - Access-Control-Allow-Origin
+  exposed-headers:
+    - Location
+    - Access-Control-Allow-Origin
+  allowed-origins:
+    - https://knowheresocial.com
+    - https://www.knowheresocial.com
+    - https://api.knowheresocial.com
+    - https://dashboard.knowheresocial.com

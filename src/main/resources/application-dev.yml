@@ -1,0 +1,27 @@
+reflectoring:
+  trace: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5433/mydb
+    driverClassName: org.postgresql.Driver
+    username: username
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    defaultSchema: edge
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  security:
+    oauth2:
+      client:
+        registration:
+          apple:
+            redirect-uri: https://d19d-2601-280-4201-490-d53c-b4cb-ebb1-e6c.ngrok-free.app/auth/oauth2/code/apple
+            private-key-path: /app/AuthKey_9L2623P6VA.p8 # Updated to container path
+cors:
+  allowed-origins:
+    - "*" # Allow all origins in dev
