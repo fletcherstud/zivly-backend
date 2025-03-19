@@ -45,11 +45,15 @@ public class BaseTest {
     @Autowired
     JwtUtil jwtUtil;
 
+    protected UUID userId;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = serverPort;
         RestAssured.baseURI = "http://localhost";
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
+        userId = createUser().getUserResponse().getId();
     }
 
     protected void addAuth(UUID userId) {

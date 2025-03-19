@@ -84,8 +84,8 @@ public class AuthController {
                             .build());
         }
 
-        String email = jwtUtil.getEmailFromToken(request.getRefreshToken(), true);
-        User user = userRepository.findByEmail(email)
+        UUID id = jwtUtil.getIdFromToken(request.getRefreshToken(), true);
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return ResponseEntity.ok(createAuthResponse(user));

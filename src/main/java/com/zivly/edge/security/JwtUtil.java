@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -25,7 +26,7 @@ public class JwtUtil {
 
     public String generateAccessToken(User user) {
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .setSubject(user.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpiration * 1000))
                 .signWith(SignatureAlgorithm.HS512, accessSecret)
@@ -41,9 +42,9 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String getEmailFromToken(String token, boolean isRefreshToken) {
+    public UUID getIdFromToken(String token, boolean isRefreshToken) {
         String secret = isRefreshToken ? refreshSecret : accessSecret;
-        return Jwts.parser().setSigningKey(secret).build().parseClaimsJws(token).getBody().getSubject();
+        return UUID.fromString(Jwts.parser().setSigningKey(secret).build().parseClaimsJws(token).getBody().getSubject());
     }
 
     public boolean validateToken(String token, boolean isRefreshToken) {

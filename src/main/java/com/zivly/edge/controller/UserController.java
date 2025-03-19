@@ -1,5 +1,6 @@
 package com.zivly.edge.controller;
 
+import com.zivly.edge.authorization.IsUser;
 import com.zivly.edge.model.request.UserRequest;
 import com.zivly.edge.model.response.UserResponse;
 import com.zivly.edge.service.UserService;
@@ -25,5 +26,13 @@ public class UserController {
         log.info("Attempting to get user id: {}", userId);
 
         return ResponseEntity.ok(userService.getUser(userId));
+    }
+
+    @IsUser
+    @PutMapping(path = "/{userId}")
+    ResponseEntity<UserResponse> updateUser(@PathVariable UUID userId) {
+        log.info("Attempting to update user {}", userId);
+
+        return ResponseEntity.ok().build();
     }
 }

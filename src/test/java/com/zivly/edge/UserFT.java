@@ -95,4 +95,14 @@ public class UserFT extends BaseTest {
         .then()
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
+
+    @Test
+    void cannotUpdateOtherUser() {
+        addAuth(UUID.randomUUID());
+        given()
+                .pathParams("userId", userId)
+        .put("/users/{userId}")
+        .then()
+            .statusCode(HttpStatus.SC_FORBIDDEN);
+    }
 }

@@ -38,7 +38,7 @@ public class AppleClientSecretGenerator {
                 .issuer(teamId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
-                .claim("aud", "https://appleid.apple.com") // Set as string, not array                .subject(clientId)
+                .claim("aud", "https://appleid.apple.com")
                 .subject(clientId)
                 .signWith(getPrivateKey(), Jwts.SIG.ES256)
                 .compact();
