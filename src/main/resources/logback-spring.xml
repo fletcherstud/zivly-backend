@@ -1,5 +1,5 @@
 <configuration>
-    <springProfile name="test | docker | it">
+    <springProfile name="test | dev | it">
         <!-- Default logging configuration -->
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
