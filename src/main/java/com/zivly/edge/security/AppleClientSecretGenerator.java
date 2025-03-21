@@ -33,19 +33,15 @@ public class AppleClientSecretGenerator {
     private String awsSecretId; // Optional, used in prod
 
     public String generate() {
-        String jwt = Jwts.builder()
+        return Jwts.builder()
                 .header().add("kid", keyId).and()
                 .issuer(teamId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
-                .claim("aud", "https://appleid.apple.com") // Set as string, not array                .subject(clientId)
+                .claim("aud", "https://appleid.apple.com")
+                .subject(clientId)
                 .signWith(getPrivateKey(), Jwts.SIG.ES256)
                 .compact();
-        log.info("JWT {}", jwt);
-        log.info("teamId (iss): {}", teamId);
-        log.info("clientId (sub): {}", clientId);
-        log.info("keyId (kid): {}", keyId);
-        return jwt;
     }
 
     private PrivateKey getPrivateKey() {
@@ -54,7 +50,6 @@ public class AppleClientSecretGenerator {
             if (privateKeyPath != null) {
                 // Development: Load from file
                 pem = new String(Files.readAllBytes(Paths.get(privateKeyPath)));
-                log.info("PEM {}", pem);
             } else if (awsSecretId != null) {
                 // Production: Placeholder for AWS Secrets Manager (uncomment and add dependency if needed)
                 throw new UnsupportedOperationException("AWS Secrets Manager not implemented yet");
@@ -69,7 +64,6 @@ public class AppleClientSecretGenerator {
             pem = pem.replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s", "");
-            log.info("After cleaning pem: {}", pem);
             byte[] keyBytes = Base64.getDecoder().decode(pem);
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
             KeyFactory kf = KeyFactory.getInstance("EC");

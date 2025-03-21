@@ -19,7 +19,8 @@ import java.util.UUID;
         name = "users",
         schema = "edge",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = "email")
+                @UniqueConstraint(columnNames = "email"),
+                @UniqueConstraint(columnNames = "providerId")
         })
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,7 +39,7 @@ public class User {
     @ToString.Exclude
     private String password;
 
-    private LocalDate birthDate;
+    private LocalDate birthdate;
 
     private String firstName;
 

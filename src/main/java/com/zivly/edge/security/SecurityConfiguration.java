@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,7 +28,8 @@ import org.springframework.util.MultiValueMap;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
@@ -45,9 +47,8 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/auth/oauth2/code/apple").permitAll()
-                        .requestMatchers("/error").permitAll() //TODO: Maybe dont expose endpoint?
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(restAuthenticationEntryPoint()) // 401 for unauthenticated
@@ -76,10 +77,6 @@ public class SecurityConfiguration {
             if ("apple".equals(request.getClientRegistration().getRegistrationId())) {
                 String clientSecret = appleClientSecretGenerator.generate();
                 parameters.add("client_secret", clientSecret);
-                System.out.println("Apple token request - client_id: " + request.getClientRegistration().getClientId() +
-                        ", code: " + request.getAuthorizationExchange().getAuthorizationResponse().getCode() +
-                        ", redirect_uri: " + request.getAuthorizationExchange().getAuthorizationRequest().getRedirectUri() +
-                        ", client_secret: " + clientSecret);
             } else {
                 parameters.add("client_secret", request.getClientRegistration().getClientSecret());
             }

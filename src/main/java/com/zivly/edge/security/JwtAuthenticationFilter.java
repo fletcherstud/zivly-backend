@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,12 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        log.info("I AM HERE!");
         String token = getTokenFromRequest(request);
 
         if (token != null && jwtUtil.validateToken(token, false)) {
-            String email = jwtUtil.getEmailFromToken(token, false);
-            User user = userRepository.findByEmail(email)
+            UUID id = jwtUtil.getIdFromToken(token, false);
+            User user = userRepository.findById(id)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             UsernamePasswordAuthenticationToken auth =

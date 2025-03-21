@@ -1,6 +1,9 @@
 reflectoring:
   trace: true
-
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG  # For request/response details
 spring:
   datasource:
     url: jdbc:postgresql://db:5433/mydb

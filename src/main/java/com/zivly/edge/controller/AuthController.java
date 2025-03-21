@@ -1,9 +1,13 @@
 package com.zivly.edge.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zivly.edge.model.AuthProvider;
 import com.zivly.edge.model.AuthResponse;
 import com.zivly.edge.model.entity.User;
+import com.zivly.edge.model.request.LoginRequest;
 import com.zivly.edge.model.request.UserRequest;
+import com.zivly.edge.model.response.UserCreateResponse;
+import com.zivly.edge.model.response.UserResponse;
 import com.zivly.edge.repository.UserRepository;
 import com.zivly.edge.security.JwtUtil;
 import lombok.Data;
@@ -29,14 +33,13 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest request) {
+    public ResponseEntity<UserCreateResponse> register(@RequestBody UserRequest request) {
         log.info("Attempting user registration {}", request);
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(AuthResponse.builder()
-                            .message("Email already registered")
-                    .build());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         User user = User.builder()
@@ -45,25 +48,31 @@ public class AuthController {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .birthdate(request.getBirthDate())
                 .authProvider(AuthProvider.LOCAL)
                 .build();
         userRepository.save(user);
-
-        return ResponseEntity.ok(createAuthResponse(user));
+        UserCreateResponse createResponse = UserCreateResponse.builder()
+                .userResponse(objectMapper.convertValue(user, UserResponse.class))
+                .tokenResponse(createAuthResponse(user))
+                .build();
+        return ResponseEntity.ok(createResponse);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<UserCreateResponse> login(@RequestBody LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.badRequest().body(AuthResponse.builder()
-                            .message("Invalid credentials")
-                    .build());
+            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(createAuthResponse(user));
+        UserCreateResponse createResponse = UserCreateResponse.builder()
+                .userResponse(objectMapper.convertValue(user, UserResponse.class))
+                .tokenResponse(createAuthResponse(user))
+                .build();
+        return ResponseEntity.ok(createResponse);
     }
 
     @PostMapping("/refresh")
@@ -75,8 +84,8 @@ public class AuthController {
                             .build());
         }
 
-        String email = jwtUtil.getEmailFromToken(request.getRefreshToken(), true);
-        User user = userRepository.findByEmail(email)
+        UUID id = jwtUtil.getIdFromToken(request.getRefreshToken(), true);
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return ResponseEntity.ok(createAuthResponse(user));
@@ -86,12 +95,6 @@ public class AuthController {
         String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
         return new AuthResponse(accessToken, refreshToken, "Authentication successful");
-    }
-
-    @Data
-    public static class LoginRequest {
-        private String email;
-        private String password;
     }
 
     @Data
